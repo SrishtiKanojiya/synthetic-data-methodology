@@ -87,7 +87,3 @@ python generate_data.py
 Outputs four chart PNGs plus a console printout of every underlying statistic: median, percentile table, coverage percentages, and volume concentration. Meant to be checked against any accompanying written content before publishing either.
 
 The `charts/` directory is committed to this repo rather than ignored, so the images above render on GitHub. That is deliberate, not an oversight. Re-running the script overwrites those committed copies, so regenerate and re-commit together.
-
-## What this demonstrates
-
-NumPy for percentile interpolation, Poisson and Pareto sampling and seeded generators. Matplotlib for multi panel layouts, symlog axes and custom styling. And the habit that matters more than either of those: computing every published number from the data rather than typing it, then checking it again on every regeneration.
