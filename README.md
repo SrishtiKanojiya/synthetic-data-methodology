@@ -35,6 +35,34 @@ This produces a right-skewed tail with the correct *shape*, individually rescale
 
 One caveat worth stating rather than glossing: the rescale itself is exact, but the integer rounding and the floor clip applied immediately afterwards can both move the sum away from the target. At the parameters in this repo the drift happens to be 0.0 percentage points. But that is something the script now *prints and checks on every run*, rather than something the reader is asked to take on trust. Change the segment share or the tail shape and the drift may stop being zero, which is precisely why it is measured rather than assumed.
 
+## The four charts
+
+Every caption printed on every chart below is computed from the same array the chart itself is drawn from. None of the figures shown are typed by hand.
+
+### 1. Monthly distribution stability
+
+![Monthly distribution stability](charts/chart1_stability.png)
+
+Twelve independently generated months as box plots, on a symlog axis so the long tail stays readable without flattening the bulk of the distribution. This answers whether a threshold chosen from a single month would still hold across a year. If the median or the interquartile range wandered month to month, any cap set on one snapshot would be arbitrary rather than representative.
+
+### 2. Distribution shape and cumulative coverage
+
+![Distribution shape and cumulative coverage](charts/chart2_distribution.png)
+
+On the left, the raw shape, with bars coloured by which segment they fall into and dashed lines marking the two candidate caps. On the right, the same data as a cumulative curve. The cumulative view is the more useful one for actually choosing a threshold, because it answers "what share of users does this cap cover" directly, instead of asking the reader to integrate a histogram by eye.
+
+### 3. Segment concentration
+
+![Segment concentration](charts/chart3_concentration.png)
+
+Users per segment on the left, total volume per segment on the right. The difference in shape between the two panels is the entire finding. A small segment driving a disproportionate share of total volume is the pattern the generator is built to produce on demand, and this pair is how you confirm it actually did.
+
+### 4. Monitoring window stress test
+
+![Monitoring window stress test](charts/chart4_stress_test.png)
+
+The 90th percentile tracked across a six month window against the proposed cap. This is the chart that surfaced problem 2 below. An earlier version showed the metric landing on exactly the same value every single month, which is mathematically tidy and reads as fabricated. It now moves the way real data moves, while still never crossing the threshold the scenario is built to demonstrate.
+
 ## Where this went wrong the first time, and what I learned from it
 
 The generation approach above isn't how the dataset started. It's what I converged on after catching real problems in an earlier version.
@@ -57,3 +85,9 @@ python generate_data.py
 ```
 
 Outputs four chart PNGs plus a console printout of every underlying statistic: median, percentile table, coverage percentages, and volume concentration. Meant to be checked against any accompanying written content before publishing either.
+
+The `charts/` directory is committed to this repo rather than ignored, so the images above render on GitHub. That is deliberate, not an oversight. Re-running the script overwrites those committed copies, so regenerate and re-commit together.
+
+## What this demonstrates
+
+NumPy for percentile interpolation, Poisson and Pareto sampling and seeded generators. Matplotlib for multi panel layouts, symlog axes and custom styling. And the habit that matters more than either of those: computing every published number from the data rather than typing it, then checking it again on every regeneration.
